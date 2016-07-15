@@ -1,0 +1,34 @@
+#交换机：
+1.接收消息，转发消息到绑定的队列。四种类型：direct, topic, headers and fanout
+
+direct：转发消息到routigKey指定的队列
+topic：按规则转发消息（最灵活）
+headers：（这个还没有接触到）
+fanout：转发消息到所有绑定队列
+2.如果交换机上(Exchange）和（Queue）是多对多的关系。
+
+3.topic类型交换器通过模式匹配分析消息的routing-key属性。它将routing-key和binding-key的字符串切分成单词。这些单词之间用点隔开。
+
+4.因为交换器是在RabbitMQ是一个实际存在的实体，不能被改变。只能删除之后，重新创建。
+
+5.交换器的属性：
+
+持久性：如果启用，交换器将会在server重启前都有效。（对应Duration属性，持久化）
+自动删除：如果启用，那么交换器将会在其绑定的队列都被删除掉之后自动删除掉自身。（创建时候设置，如果不设置不会自动删除）。
+惰性：如果没有声明交换器，那么在执行到使用的时候会导致异常，并不会主动声明。（不会自动创建）
+
+队列的属性：
+消息在队列中保存，以轮询的方式将消息发送给监听消息队列的消费者，可以动态的增加消费者以提高消息的处理能力。
+    高可用性
+
+消息ACK，通知RabbitMQ消息已被处理，可以从内存删除。如果消费者因宕机或链接失败等原因没有发送ACK（不同于ActiveMQ，在RabbitMQ里，消息没有过期的概念），则RabbitMQ会将消息重新发送给其他监听在队列的下一个消费者。
+
+消息和队列的持久化。定义队列时可以指定队列的持久化属性（问：持久化队列如何删除？） channel.queueDeclare(queuename, durable=true, false, false, null); 发送消息时可以指定消息持久化属性：这样，即使RabbitMQ服务器重启，也不会丢失队列和消息。
+
+publisher confirms 提供批量确认消息的方法
+
+master/slave机制，配合Mirrored Queue。Mirrored Queue通过policy和rabbitmqctl设置可以实现。具体可以参考Rabbitmq官方文档。在Mirrored Queue下，无论Producer和Consumer连接那个RabbitMq服务器，都跟连接同一个RabbitMQ上，消费和生产数据会被同步。注意：Mirrored Queue会严重的消耗性能，性能会下降到原来的1/5。当一个slave重新加入mirrored-queue时，如果queue是durable的，则会被清空。
+
+
+
+
